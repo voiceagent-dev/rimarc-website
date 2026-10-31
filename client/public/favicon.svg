@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+<title>RIMARC AI icon</title>
+<defs><linearGradient id="arc" gradientUnits="userSpaceOnUse" x1="150.0" y1="0" x2="880.0" y2="0"><stop offset="0" stop-color="#FF7A1A"/><stop offset="0.33" stop-color="#F2367E"/><stop offset="0.66" stop-color="#8B5CF6"/><stop offset="1" stop-color="#14B8A6"/></linearGradient></defs>
+<rect width="1024" height="1024" rx="224" fill="#FDFCFC"/>
+<path d="M318.5625 834.8125H414.8125V672.0H499.1875C499.5 672.0 499.8125 672.0 500.125 672.0L582.625 834.8125H685.75L592.3125 653.875C644.5 629.8125 675.4375 583.5625 675.4375 522.0C675.4375 428.25 609.8125 369.1875 504.8125 369.1875H318.5625ZM414.8125 594.8125V449.1875H498.875C549.8125 449.1875 581.375 477.625 581.375 522.0C581.375 566.375 549.8125 594.8125 499.1875 594.8125Z" fill="#0B0B0F"/>
+<path d="M150,520 C300,170 650,110 880,300" fill="none" stroke="url(#arc)" stroke-width="64" stroke-linecap="round"/>
+<circle cx="880" cy="300" r="54" fill="#14B8A6"/>
+</svg>

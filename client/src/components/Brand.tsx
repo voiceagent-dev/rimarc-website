@@ -1,0 +1,90 @@
+import { useEffect, useId, useRef, useState, type ReactNode } from "react";
+
+export function Logo({ variant = "dark", className = "" }: { variant?: "dark" | "light"; className?: string }) {
+  return (
+    <img
+      src={variant === "light" ? "/brand/logo-header-white.svg" : "/brand/logo-header.svg"}
+      alt="RIMARC AI · Automate Beyond Limits"
+      width={1228}
+      height={434}
+      className={`h-11 w-auto sm:h-12 ${className}`}
+    />
+  );
+}
+
+/** The signature gradient arc from the logo, used as a decorative line. */
+export function Arc({ className = "", animate = true, strokeWidth = 3 }: { className?: string; animate?: boolean; strokeWidth?: number }) {
+  const id = useId();
+  return (
+    <svg className={className} viewBox="0 0 1200 120" fill="none" preserveAspectRatio="none" aria-hidden="true">
+      <defs>
+        <linearGradient id={id} x1="0" x2="1">
+          <stop offset="0" stopColor="#FF7A1A" />
+          <stop offset="0.35" stopColor="#F2367E" />
+          <stop offset="0.68" stopColor="#8B5CF6" />
+          <stop offset="1" stopColor="#14B8A6" />
+        </linearGradient>
+      </defs>
+      <path
+        d="M10 110 C 260 20, 820 -10, 1180 40"
+        stroke={`url(#${id})`}
+        strokeWidth={strokeWidth}
+        strokeLinecap="round"
+        vectorEffect="non-scaling-stroke"
+        pathLength={1}
+        className={animate ? "draw-arc" : ""}
+      />
+    </svg>
+  );
+}
+
+/** Animated voice waveform in the arc gradient. */
+export function Waveform({ bars = 28, className = "" }: { bars?: number; className?: string }) {
+  const colors = ["#FF7A1A", "#F2367E", "#8B5CF6", "#14B8A6"];
+  return (
+    <div className={`flex h-12 items-center gap-[3px] ${className}`} aria-hidden="true">
+      {Array.from({ length: bars }, (_, i) => {
+        const t = i / (bars - 1);
+        const color = colors[Math.min(3, Math.floor(t * 4))];
+        const h = 30 + 70 * Math.abs(Math.sin(i * 1.7));
+        return (
+          <span
+            key={i}
+            className="wave-bar w-[3px] rounded-full"
+            style={{ height: `${h}%`, background: color, animationDelay: `${(i % 7) * 0.12}s` }}
+          />
+        );
+      })}
+    </div>
+  );
+}
+
+export function Eyebrow({ children }: { children: ReactNode }) {
+  return <p className="eyebrow">{children}</p>;
+}
+
+/** Fades content in as it scrolls into view. */
+export function Reveal({ children, className = "", delay = 0 }: { children: ReactNode; className?: string; delay?: number }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [visible, setVisible] = useState(false);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(
+      ([entry]) => {
+        if (entry?.isIntersecting) {
+          setVisible(true);
+          obs.disconnect();
+        }
+      },
+      { rootMargin: "0px 0px -10% 0px", threshold: 0.08 },
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
+  return (
+    <div ref={ref} className={`reveal ${visible ? "is-visible" : ""} ${className}`} style={{ transitionDelay: `${delay}ms` }}>
+      {children}
+    </div>
+  );
+}

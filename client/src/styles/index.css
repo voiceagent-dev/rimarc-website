@@ -1,0 +1,180 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter Variable", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  --color-canvas: #fdfcfc;
+  --color-surface: #f5f3f1;
+  --color-surface-2: #ebe8e4;
+  --color-ink: #0b0b0f;
+  --color-muted: #6e6862;
+  --color-subtle: #a59f97;
+  --color-navy: #0b1426;
+  --color-line: rgb(0 0 0 / 0.07);
+
+  --color-arc-orange: #ff7a1a;
+  --color-arc-pink: #f2367e;
+  --color-arc-violet: #8b5cf6;
+  --color-arc-teal: #14b8a6;
+
+  --radius-card: 1.75rem;
+  --shadow-float: 0 24px 60px -24px rgb(11 20 38 / 0.35);
+  --ease-out-soft: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@layer base {
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    scroll-behavior: smooth;
+  }
+  body {
+    @apply bg-canvas text-ink font-sans;
+    font-feature-settings: "ss01", "cv11";
+  }
+  ::selection {
+    background: rgb(242 54 126 / 0.18);
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-arc-violet);
+    outline-offset: 3px;
+    border-radius: 6px;
+  }
+}
+
+@utility container-page {
+    @apply mx-auto w-full max-w-[1280px] px-5 sm:px-8 lg:px-12;
+}
+
+@utility display {
+    @apply font-light tracking-[-0.045em] leading-[1.02];
+}
+
+@utility heading {
+    @apply font-light tracking-[-0.035em] leading-[1.08];
+}
+
+@utility eyebrow {
+    @apply inline-flex items-center gap-3 text-[12px] font-medium uppercase tracking-[0.18em] text-muted;
+    &::before {
+      content: "";
+      @apply h-[2px] w-7 rounded-full;
+      background: linear-gradient(90deg, var(--color-arc-orange), var(--color-arc-pink), var(--color-arc-violet), var(--color-arc-teal));
+    }
+}
+
+@utility btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-[15px] font-medium transition-all duration-300 select-none;
+}
+
+@utility btn-primary {
+    @apply btn bg-navy text-white hover:-translate-y-0.5 hover:shadow-[var(--shadow-float)];
+}
+
+@utility btn-secondary {
+    @apply btn border border-black/10 bg-white text-ink hover:border-black/25;
+}
+
+@utility card {
+    @apply rounded-[var(--radius-card)] border border-line bg-surface;
+}
+
+@utility arc-text {
+    background: linear-gradient(90deg, var(--color-arc-orange), var(--color-arc-pink) 45%, var(--color-arc-violet));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+@utility field-label {
+    @apply mb-1.5 block text-[13px] font-semibold text-ink;
+}
+
+@utility field {
+    @apply h-12 w-full rounded-xl border border-black/10 bg-white px-4 text-[15px] text-ink placeholder:text-subtle transition focus:border-arc-violet focus:outline-none focus:ring-4 focus:ring-arc-violet/15;
+}
+
+/* Reveal-on-scroll animation (respects reduced-motion settings) */
+.reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition:
+    opacity 0.9s var(--ease-out-soft),
+    transform 0.9s var(--ease-out-soft);
+}
+.reveal.is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+@keyframes wave {
+  0%,
+  100% {
+    transform: scaleY(0.35);
+  }
+  50% {
+    transform: scaleY(1);
+  }
+}
+.wave-bar {
+  transform-origin: center;
+  animation: wave 1.4s ease-in-out infinite;
+}
+
+@keyframes pulse-dot {
+  0% {
+    box-shadow: 0 0 0 0 rgb(20 184 166 / 0.55);
+  }
+  100% {
+    box-shadow: 0 0 0 10px rgb(20 184 166 / 0);
+  }
+}
+.pulse-dot {
+  animation: pulse-dot 1.8s ease-out infinite;
+}
+
+@keyframes float-y {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+.float {
+  animation: float-y 6s ease-in-out infinite;
+}
+
+@keyframes draw {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+.draw-arc {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: draw 2.2s var(--ease-out-soft) 0.2s forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  .wave-bar,
+  .pulse-dot,
+  .float,
+  .draw-arc {
+    animation: none;
+    stroke-dashoffset: 0;
+  }
+}
