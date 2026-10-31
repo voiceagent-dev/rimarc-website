@@ -1,14 +1,38 @@
 import { useEffect, useId, useRef, useState, type ReactNode } from "react";
 
+/**
+ * Header/footer logo. The wordmark is real text (sharp at any size, on any screen) and the
+ * arc is drawn with a fixed 2.5px line, so nothing turns thin or blurry when the logo is small.
+ */
 export function Logo({ variant = "dark", className = "" }: { variant?: "dark" | "light"; className?: string }) {
+  const id = useId();
   return (
-    <img
-      src={variant === "light" ? "/brand/logo-mark-white.svg" : "/brand/logo-mark.svg"}
-      alt="RIMARC AI"
-      width={1220}
-      height={336}
-      className={`h-9 w-auto sm:h-10 ${className}`}
-    />
+    <span
+      role="img"
+      aria-label="RIMARC AI"
+      className={`relative inline-block h-[46px] w-[162px] select-none ${className}`}
+    >
+      <svg className="absolute inset-0 h-full w-full" viewBox="0 0 162 46" fill="none" aria-hidden="true">
+        <defs>
+          <linearGradient id={id} x1="0" x2="1">
+            <stop offset="0" stopColor="#FF7A1A" />
+            <stop offset="0.35" stopColor="#F2367E" />
+            <stop offset="0.68" stopColor="#8B5CF6" />
+            <stop offset="1" stopColor="#14B8A6" />
+          </linearGradient>
+        </defs>
+        <path d="M3.5 34 C 4 9, 46 3, 96 4 C 122 5, 140 8, 152 11.5" stroke={`url(#${id})`} strokeWidth="2.6" strokeLinecap="round" />
+        <circle cx="153" cy="11.8" r="3.4" fill="#14B8A6" />
+      </svg>
+      <span
+        aria-hidden="true"
+        className={`absolute bottom-[3px] left-[12px] whitespace-nowrap text-[24px] font-extrabold leading-none tracking-[-0.025em] ${
+          variant === "light" ? "text-white" : "text-ink"
+        }`}
+      >
+        RIMARC <span className="arc-text">AI</span>
+      </span>
+    </span>
   );
 }
 
