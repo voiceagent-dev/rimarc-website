@@ -3,11 +3,11 @@ import { useEffect, useId, useRef, useState, type ReactNode } from "react";
 export function Logo({ variant = "dark", className = "" }: { variant?: "dark" | "light"; className?: string }) {
   return (
     <img
-      src={variant === "light" ? "/brand/logo-header-white.svg" : "/brand/logo-header.svg"}
-      alt="RIMARC AI · Automate Beyond Limits"
-      width={1228}
-      height={434}
-      className={`h-11 w-auto sm:h-12 ${className}`}
+      src={variant === "light" ? "/brand/logo-mark-white.svg" : "/brand/logo-mark.svg"}
+      alt="RIMARC AI"
+      width={1220}
+      height={336}
+      className={`h-9 w-auto sm:h-10 ${className}`}
     />
   );
 }
