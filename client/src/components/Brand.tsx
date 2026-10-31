@@ -2,7 +2,7 @@ import { useEffect, useId, useRef, useState, type ReactNode } from "react";
 
 /**
  * Header/footer logo. The wordmark is real text (sharp at any size, on any screen) and the
- * arc is drawn with a fixed 2.5px line, so nothing turns thin or blurry when the logo is small.
+ * arc is drawn with a fixed 3.4px line, so nothing turns thin or blurry when the logo is small.
  */
 export function Logo({ variant = "dark", className = "" }: { variant?: "dark" | "light"; className?: string }) {
   const id = useId();
@@ -10,9 +10,9 @@ export function Logo({ variant = "dark", className = "" }: { variant?: "dark" | 
     <span
       role="img"
       aria-label="RIMARC AI"
-      className={`relative inline-block h-[46px] w-[162px] select-none ${className}`}
+      className={`relative inline-block h-[50px] w-[176px] select-none ${className}`}
     >
-      <svg className="absolute inset-0 h-full w-full" viewBox="0 0 162 46" fill="none" aria-hidden="true">
+      <svg className="absolute inset-0 h-full w-full" viewBox="0 0 176 50" fill="none" aria-hidden="true">
         <defs>
           <linearGradient id={id} x1="0" x2="1">
             <stop offset="0" stopColor="#FF7A1A" />
@@ -21,12 +21,12 @@ export function Logo({ variant = "dark", className = "" }: { variant?: "dark" | 
             <stop offset="1" stopColor="#14B8A6" />
           </linearGradient>
         </defs>
-        <path d="M3.5 34 C 4 9, 46 3, 96 4 C 122 5, 140 8, 152 11.5" stroke={`url(#${id})`} strokeWidth="2.6" strokeLinecap="round" />
-        <circle cx="153" cy="11.8" r="3.4" fill="#14B8A6" />
+        <path d="M4 37.5 C 4.5 10, 50 3.4, 104 4.4 C 132 5.5, 152 8.8, 165 12.6" stroke={`url(#${id})`} strokeWidth="3.4" strokeLinecap="round" />
+        <circle cx="166" cy="12.9" r="4" fill="#14B8A6" />
       </svg>
       <span
         aria-hidden="true"
-        className={`absolute bottom-[3px] left-[12px] whitespace-nowrap text-[24px] font-extrabold leading-none tracking-[-0.025em] ${
+        className={`absolute bottom-[3px] left-[13px] whitespace-nowrap text-[26px] font-extrabold leading-none tracking-[-0.025em] ${
           variant === "light" ? "text-white" : "text-ink"
         }`}
       >
