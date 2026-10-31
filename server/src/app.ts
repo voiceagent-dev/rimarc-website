@@ -26,12 +26,15 @@ export function createApp(cfg: Config, log: Logger) {
       autoLogging: { ignore: (req) => !String(req.url).startsWith("/api") },
     }),
   );
-  // Send www.rimarcai.com (and any other subdomain alias) to the main address with one permanent redirect.
+  // Send every other address of the domain (rimarcai.com, or www.rimarcai.com when the bare
+  // domain is the main one) to the main address with one permanent redirect.
   if (cfg.CANONICAL_HOST) {
     const canonical = cfg.CANONICAL_HOST;
+    const base = canonical.replace(/^www\./, "");
     app.use((req, res, next) => {
       const host = req.hostname;
-      if (host !== canonical && host.endsWith(`.${canonical}`) && (req.method === "GET" || req.method === "HEAD")) {
+      const sameSite = host === base || host.endsWith(`.${base}`);
+      if (host !== canonical && sameSite && (req.method === "GET" || req.method === "HEAD")) {
         res.redirect(301, `https://${canonical}${req.originalUrl}`);
         return;
       }

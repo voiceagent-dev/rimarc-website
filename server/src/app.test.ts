@@ -24,7 +24,7 @@ before(async () => {
     RATE_LIMIT_API_PER_MINUTE: "1000",
     VAPI_WEBHOOK_SECRET: "webhook-secret",
     CLIENT_DIST: "/nonexistent",
-    CANONICAL_HOST: "rimarcai.com",
+    CANONICAL_HOST: "www.rimarcai.com",
   });
   server = createApp(cfg, createLogger("test")).listen(0);
   await new Promise((r) => server.once("listening", r));
@@ -179,7 +179,7 @@ test("config refuses weak secrets and http origins in production", () => {
   assert.throws(() => loadConfig({ HASH_SECRET: "x".repeat(40), DEMO_CALL_MODE: "live" }));
 });
 
-test("www redirects to the main domain", async () => {
+test("bare domain redirects to www", async () => {
   const { request } = await import("node:http");
   const get = (host: string, path: string) =>
     new Promise<{ status: number; location?: string }>((resolve, reject) => {
@@ -190,9 +190,11 @@ test("www redirects to the main domain", async () => {
       req.on("error", reject);
       req.end();
     });
-  const www = await get("www.rimarcai.com", "/about?x=1");
-  assert.equal(www.status, 301);
-  assert.equal(www.location, "https://rimarcai.com/about?x=1");
+  const bare = await get("rimarcai.com", "/about?x=1");
+  assert.equal(bare.status, 301);
+  assert.equal(bare.location, "https://www.rimarcai.com/about?x=1");
+  const main = await get("www.rimarcai.com", "/api/health");
+  assert.equal(main.status, 200);
   const other = await get("evil.com", "/api/health");
   assert.equal(other.status, 200);
 });

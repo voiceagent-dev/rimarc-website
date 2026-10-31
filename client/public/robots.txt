@@ -2,4 +2,4 @@ User-agent: *
 Allow: /
 Disallow: /api/
 
-Sitemap: https://rimarcai.com/sitemap.xml
+Sitemap: https://www.rimarcai.com/sitemap.xml

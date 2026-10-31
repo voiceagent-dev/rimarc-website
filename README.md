@@ -18,21 +18,21 @@ npm test                      # 16 server tests (security headers, CSRF, validat
 
 In `mock` mode the form works end to end, but no call is placed.
 
-## Go live on https://rimarcai.com (Render)
+## Go live on https://www.rimarcai.com (Render)
 
 1. **Put the code on GitHub** in a private repository.
 2. **Create the web service:** on [render.com](https://render.com), choose New → Web Service, connect the repository, and choose **Docker** (it uses the included `Dockerfile`). The paid "Starter" plan stays awake; the free plan sleeps after inactivity, so the first visitor waits about 30 seconds.
 3. **Environment variables** (Render → Environment), from `.env.example`:
    - `NODE_ENV=production`, `TRUST_PROXY=1`
    - `PUBLIC_ORIGINS=https://rimarcai.com,https://www.rimarcai.com`
-   - `CANONICAL_HOST=rimarcai.com`
+   - `CANONICAL_HOST=www.rimarcai.com`
    - `HASH_SECRET=` a random 64-character value (`openssl rand -hex 32`)
    - `DEMO_CALL_MODE=mock` until the phone line works, then `live` plus the three `VAPI_*` values and `VAPI_WEBHOOK_SECRET`
 4. **Add the domain:** Render → Settings → Custom Domains → add `rimarcai.com` and `www.rimarcai.com`. Render shows the exact DNS records to create.
 5. **DNS at your domain registrar:** create the records Render shows (normally an **A record** for `@`/`rimarcai.com` and a **CNAME** for `www` pointing to your `…onrender.com` address). Delete any old A, AAAA or CNAME records for `@` and `www` (for example the registrar's parking page).
 6. **Wait for verification:** Render checks the records and issues the free HTTPS certificate automatically, usually within minutes, sometimes up to a few hours.
-7. **Check:** open https://rimarcai.com, then https://www.rimarcai.com (should redirect), and https://rimarcai.com/api/health (should show `{"ok":true}`).
-8. **Vapi call reports (optional):** set Vapi's server URL to `https://rimarcai.com/api/vapi/webhook`, with the same secret as `VAPI_WEBHOOK_SECRET`.
+7. **Check:** open https://www.rimarcai.com, then https://rimarcai.com (should redirect to www), and https://www.rimarcai.com/api/health (should show `{"ok":true}`).
+8. **Vapi call reports (optional):** set Vapi's server URL to `https://www.rimarcai.com/api/vapi/webhook`, with the same secret as `VAPI_WEBHOOK_SECRET`.
 
 Any host that runs Docker or Node 22 works the same way (Railway, Fly.io, a VPS with Caddy or Nginx). Without Docker: `npm ci && npm run build && npm start`.
 
