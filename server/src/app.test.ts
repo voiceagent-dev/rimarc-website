@@ -198,3 +198,54 @@ test("bare domain redirects to www", async () => {
   const other = await get("evil.com", "/api/health");
   assert.equal(other.status, 200);
 });
+
+test("n8n mode forwards a signed, validated request to the n8n webhook", async () => {
+  const { createServer } = await import("node:http");
+  let received: { headers: Record<string, unknown>; body: Record<string, unknown> } | undefined;
+  const n8n = createServer((req, res) => {
+    let raw = "";
+    req.on("data", (c) => (raw += c));
+    req.on("end", () => {
+      received = { headers: req.headers, body: JSON.parse(raw) };
+      res.writeHead(200, { "Content-Type": "application/json" }).end('{"ok":true}');
+    });
+  }).listen(0);
+  await new Promise((r) => n8n.once("listening", r));
+  const hookUrl = `http://127.0.0.1:${(n8n.address() as AddressInfo).port}/webhook/rimarc-demo-call`;
+
+  const cfg = loadConfig({
+    NODE_ENV: "test",
+    HASH_SECRET: "test-secret-that-is-long-enough-123456",
+    DEMO_CALL_MODE: "n8n",
+    N8N_DEMO_WEBHOOK_URL: hookUrl,
+    OUTBOUND_WEBHOOK_SECRET: "n8n-shared-secret-0123456789",
+    CALL_WINDOW_START_HOUR: "0",
+    CALL_WINDOW_END_HOUR: "24",
+    CLIENT_DIST: "/nonexistent",
+  });
+  const app = createApp(cfg, createLogger("test")).listen(0);
+  await new Promise((r) => app.once("listening", r));
+  const url = `http://127.0.0.1:${(app.address() as AddressInfo).port}/api/demo-call`;
+  const res = await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Origin: ORIGIN, "X-Requested-With": "rimarc-web" },
+    body: JSON.stringify(goodForm({ email: "n8n@example.com", phone_number: "91234 56789" })),
+  });
+  app.close();
+  n8n.close();
+
+  assert.equal(res.status, 202);
+  assert.ok(received, "n8n webhook was called");
+  assert.equal(received.headers["x-rimarc-secret"], "n8n-shared-secret-0123456789");
+  assert.equal(received.body.phone_number, "+919123456789");
+  assert.equal(received.body.prospect_name, "Rohan");
+  assert.equal(received.body.configuration, "2 Bedroom");
+  assert.equal(received.body.type, "demo-call-request");
+});
+
+test("n8n mode refuses to start without a webhook URL and secret", () => {
+  assert.throws(() => loadConfig({ HASH_SECRET: "x".repeat(40), DEMO_CALL_MODE: "n8n" }));
+  assert.throws(() =>
+    loadConfig({ HASH_SECRET: "x".repeat(40), DEMO_CALL_MODE: "n8n", N8N_DEMO_WEBHOOK_URL: "https://x.app.n8n.cloud/webhook/a" }),
+  );
+});

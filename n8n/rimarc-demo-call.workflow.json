@@ -1,0 +1,126 @@
+{
+  "name": "RIMARC AI \u00b7 Website demo call",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "rimarc-demo-call",
+        "authentication": "headerAuth",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "name": "Website demo form",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        0
+      ],
+      "webhookId": "rimarc-demo-call",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "",
+          "name": "RIMARC website secret"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.vapi.ai/call",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({\n  assistantId: 'PASTE_VAPI_ASSISTANT_ID',\n  phoneNumberId: 'PASTE_VAPI_PHONE_NUMBER_ID',\n  customer: { number: $json.body.phone_number, name: $json.body.full_name },\n  assistantOverrides: { variableValues: {\n    prospect_name: $json.body.prospect_name,\n    email: $json.body.email,\n    phone_number: $json.body.phone_number,\n    purpose: $json.body.purpose,\n    configuration: $json.body.configuration,\n    prospect_location: $json.body.prospect_location,\n    lead_source_line: \"You'd requested a demo call on our website.\"\n  } }\n}) }}",
+        "options": {
+          "timeout": 15000
+        }
+      },
+      "name": "Start Vapi call",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        260,
+        0
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "",
+          "name": "Vapi API key"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "1NiQPnsYC3clVD1hqPPrWOvn-flFzbJBQFD7MgT5ugYQ"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Call Outputs"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "call_id": "={{ $json.id }}",
+            "call_date_time_ist": "={{ $now.setZone('Asia/Kolkata').toFormat('yyyy-MM-dd HH:mm') }}",
+            "phone_number": "={{ $('Website demo form').item.json.body.phone_number }}",
+            "prospect_name": "={{ $('Website demo form').item.json.body.full_name }}",
+            "form_email": "={{ $('Website demo form').item.json.body.email }}",
+            "form_purpose": "={{ $('Website demo form').item.json.body.purpose }}",
+            "form_configuration": "={{ $('Website demo form').item.json.body.configuration }}",
+            "form_prospect_location": "={{ $('Website demo form').item.json.body.location }}"
+          },
+          "matchingColumns": [],
+          "schema": []
+        },
+        "options": {}
+      },
+      "name": "Log lead in Google Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        520,
+        0
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "",
+          "name": "Google Sheets account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Website demo form": {
+      "main": [
+        [
+          {
+            "node": "Start Vapi call",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Start Vapi call": {
+      "main": [
+        [
+          {
+            "node": "Log lead in Google Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

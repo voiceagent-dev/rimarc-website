@@ -36,6 +36,19 @@ In `mock` mode the form works end to end, but no call is placed.
 
 Any host that runs Docker or Node 22 works the same way (Railway, Fly.io, a VPS with Caddy or Nginx). Without Docker: `npm ci && npm run build && npm start`.
 
+## Trigger an n8n workflow from the demo form
+
+1. In n8n: **Workflows → Import from File** → `n8n/rimarc-demo-call.workflow.json`.
+2. Create the three credentials it asks for:
+   - **RIMARC website secret** (Header Auth): Name `X-Rimarc-Secret`, Value = a long random string.
+   - **Vapi API key** (Header Auth): Name `Authorization`, Value `Bearer <your Vapi private key>`.
+   - **Google Sheets account**: sign in with the Google account that owns "Call Analysis Output".
+3. In **Start Vapi call**, replace `PASTE_VAPI_ASSISTANT_ID` and `PASTE_VAPI_PHONE_NUMBER_ID`.
+4. **Activate** the workflow, open the **Website demo form** node and copy the **Production URL**.
+5. In Render → Environment set `DEMO_CALL_MODE=n8n`, `N8N_DEMO_WEBHOOK_URL=<Production URL>` and `OUTBOUND_WEBHOOK_SECRET=<same value as the header credential>`.
+
+The website validates everything first (phone, consent, duplicates, calling hours, rate limits), so n8n only receives clean, consented requests.
+
 ## What the demo form sends to Vapi
 
 | Form field | Vapi variable |

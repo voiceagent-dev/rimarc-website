@@ -31,6 +31,7 @@ export type CallResult = { ok: true; callId: string } | { ok: false; status: num
 /** Places the outbound demo call through Vapi. The API key never leaves the server. */
 export async function startVapiCall(cfg: Config, input: DemoCallInput, e164: string): Promise<CallResult> {
   if (cfg.DEMO_CALL_MODE === "mock") return { ok: true, callId: "mock-call" };
+  if (cfg.DEMO_CALL_MODE === "n8n") return sendToN8n(cfg, input, e164);
 
   const firstName = input.full_name.split(" ")[0] ?? input.full_name;
   const res = await postJson(
@@ -80,4 +81,32 @@ export async function verifyTurnstile(cfg: Config, token: string | undefined, ip
   });
   const data = (await res.json().catch(() => ({}))) as { success?: boolean };
   return data.success === true;
+}
+
+/**
+ * n8n mode: send the validated demo request to the n8n webhook, signed with X-Rimarc-Secret.
+ * The n8n workflow places the Vapi call and logs the lead. Field names match the Vapi variables.
+ */
+async function sendToN8n(cfg: Config, input: DemoCallInput, e164: string): Promise<CallResult> {
+  const firstName = input.full_name.split(" ")[0] ?? input.full_name;
+  const res = await postJson(
+    cfg.N8N_DEMO_WEBHOOK_URL!,
+    {
+      type: "demo-call-request",
+      received_at: new Date().toISOString(),
+      prospect_name: firstName,
+      full_name: input.full_name,
+      email: input.email,
+      phone_number: e164,
+      location: input.location,
+      prospect_location: toProspectLocation(input.location),
+      purpose: input.purpose,
+      configuration: input.configuration,
+      consent: true,
+      source: "rimarcai.com demo form",
+    },
+    { "X-Rimarc-Secret": cfg.OUTBOUND_WEBHOOK_SECRET ?? "" },
+  );
+  if (!res.ok) return { ok: false, status: res.status };
+  return { ok: true, callId: "n8n" };
 }
