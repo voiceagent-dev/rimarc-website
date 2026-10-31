@@ -33,8 +33,8 @@ before(async () => {
 after(() => server.close());
 
 const goodForm = (over: Record<string, unknown> = {}) => ({
-  full_name: "Rohan Mehta",
-  email: "rohan@example.com",
+  full_name: "Stevie Mehta",
+  email: "stevie@example.com",
   dial_code: "+91",
   phone_number: "98765 43210",
   location: "India",
@@ -238,7 +238,7 @@ test("n8n mode forwards a signed, validated request to the n8n webhook", async (
   assert.ok(received, "n8n webhook was called");
   assert.equal(received.headers["x-rimarc-secret"], "n8n-shared-secret-0123456789");
   assert.equal(received.body.phone_number, "+919123456789");
-  assert.equal(received.body.prospect_name, "Rohan");
+  assert.equal(received.body.prospect_name, "Stevie");
   assert.equal(received.body.configuration, "2 Bedroom");
   assert.equal(received.body.type, "demo-call-request");
 });

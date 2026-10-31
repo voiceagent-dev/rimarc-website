@@ -11,7 +11,7 @@ type Line =
 
 // A sample call. The labels mark the three things the agent is doing at that moment.
 const transcript: Line[] = [
-  { kind: "agent", text: "Hi, this is Rahul. Am I speaking with Rohan?" },
+  { kind: "agent", text: "Hi, this is Rahul. Am I speaking with Stevie?" },
   { kind: "you", text: "Yes, speaking." },
   { kind: "agent", text: "Thanks for your enquiry. I see you're looking at a two bedroom for investment, right?" },
   { kind: "you", text: "Yes. When is the handover?" },

@@ -140,7 +140,7 @@ function ContextVisual() {
     <div className="grid gap-3 sm:grid-cols-[1fr_auto_1.3fr] sm:items-center">
       <div className={`${panel} text-[13px]`}>
         <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-subtle">Enquiry form</p>
-        <p className="mt-2 font-semibold text-ink">Rohan</p>
+        <p className="mt-2 font-semibold text-ink">Stevie</p>
         <p className="text-muted">Investment · 2 Bedroom</p>
       </div>
       <ArrowRight size={18} className="mx-auto rotate-90 text-arc-pink sm:rotate-0" />
@@ -177,7 +177,7 @@ function HandoffVisual() {
         <span className="rounded-full bg-arc-orange/10 px-2.5 py-0.5 text-[11px] font-bold tracking-[0.1em] text-arc-orange">WARM</span>
       </div>
       <p className="mt-2 text-[14px] leading-relaxed text-ink">
-        Rohan · Investment · 2 Bedroom · Budget ₹4–5 Cr
+        Stevie · Investment · 2 Bedroom · Budget ₹4–5 Cr
         <br />
         <span className="text-muted">Pending:</span> payment plan
         <br />

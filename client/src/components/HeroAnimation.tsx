@@ -90,7 +90,7 @@ export default function HeroAnimation() {
       </div>
 
       {/* step cards */}
-      <StepCard className="left-[4%] top-[8%]" step={0} icon={FileText} title="New lead" sub="Rohan · 2 Bedroom" />
+      <StepCard className="left-[4%] top-[8%]" step={0} icon={FileText} title="New lead" sub="Stevie · 2 Bedroom" />
       <StepCard className="right-[4%] top-[8%]" step={1} icon={PhoneCall} title="Calling now" sub="Answered in 37 sec" />
       <StepCard className="bottom-[8%] right-[4%]" step={2} icon={ClipboardList} title="Requirements captured" sub="₹4–5 Cr · 3 months" />
       <StepCard className="bottom-[8%] left-[4%]" step={3} icon={CalendarCheck2} title="Meeting booked" sub="Tue · 4:15 PM ✓" />

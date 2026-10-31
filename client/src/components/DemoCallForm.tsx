@@ -66,7 +66,7 @@ export default function DemoCallForm() {
 
             <div>
               <label className="field-label" htmlFor="full_name">Full name</label>
-              <input id="full_name" name="full_name" className="field" placeholder="e.g. Rohan Mehta" autoComplete="name" maxLength={80} required />
+              <input id="full_name" name="full_name" className="field" placeholder="e.g. Stevie Mehta" autoComplete="name" maxLength={80} required />
             </div>
 
             <div>
