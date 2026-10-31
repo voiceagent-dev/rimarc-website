@@ -1,10 +1,11 @@
 import { Link } from "react-router";
-import { ArrowRight, CalendarCheck2, KeyRound, Lock, ShieldCheck, UserCheck } from "lucide-react";
+import { ArrowRight, KeyRound, Lock, ShieldCheck, UserCheck } from "lucide-react";
 import Picture from "../components/Picture";
 import PhoneMockup from "../components/PhoneMockup";
-import { Arc, Eyebrow, Reveal, Waveform } from "../components/Brand";
+import { Arc, Eyebrow, Reveal } from "../components/Brand";
 import { usePageTitle } from "../lib/usePageTitle";
 import WhatItSolves from "../sections/WhatItSolves";
+import HeroAnimation from "../components/HeroAnimation";
 
 export default function Home() {
   usePageTitle("RIMARC AI · Automate Beyond Limits");
@@ -47,26 +48,8 @@ function Hero() {
         </Reveal>
       </div>
 
-      <Reveal delay={150} className="relative">
-        <Picture
-          slug="hero-ai"
-          alt="A glowing 3D rendering of the letters AI on a circuit surface"
-          sizes="(min-width: 1024px) 46vw, 100vw"
-          priority
-          className="aspect-[5/4] rounded-[2rem] lg:aspect-square"
-          imgClassName="object-[62%_50%]"
-        />
-        <div className="float absolute -left-4 top-10 rounded-2xl border border-white/60 bg-white/90 px-4 py-3 shadow-[var(--shadow-float)] backdrop-blur sm:-left-8">
-          <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-subtle">Voice AI · Live call</p>
-          <Waveform bars={20} className="mt-1 !h-9" />
-        </div>
-        <div className="float absolute -right-3 bottom-10 flex items-center gap-3 rounded-2xl bg-navy px-4 py-3 text-white shadow-[var(--shadow-float)] [animation-delay:1.5s] sm:-right-6">
-          <CalendarCheck2 size={20} className="text-arc-teal" />
-          <div>
-            <p className="text-[14px] font-semibold">Meeting booked</p>
-            <p className="text-[12px] text-white/65">Tomorrow · 4:15 PM</p>
-          </div>
-        </div>
+      <Reveal delay={150}>
+        <HeroAnimation />
       </Reveal>
     </section>
   );
