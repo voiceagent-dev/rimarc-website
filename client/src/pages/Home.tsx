@@ -4,12 +4,14 @@ import Picture from "../components/Picture";
 import PhoneMockup from "../components/PhoneMockup";
 import { Arc, Eyebrow, Reveal, Waveform } from "../components/Brand";
 import { usePageTitle } from "../lib/usePageTitle";
+import WhatItSolves from "../sections/WhatItSolves";
 
 export default function Home() {
   usePageTitle("RIMARC AI · Automate Beyond Limits");
   return (
     <>
       <Hero />
+      <WhatItSolves />
       <VoiceSpotlight />
       <Trust />
       <ClosingCta />
