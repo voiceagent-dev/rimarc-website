@@ -5,19 +5,25 @@ import Picture from "../components/Picture";
 import { Eyebrow, Reveal, Waveform } from "../components/Brand";
 import { usePageTitle } from "../lib/usePageTitle";
 
-const transcript = [
-  { who: "agent", text: "Hi, this is Rahul. Am I speaking with Rohan?" },
-  { who: "you", text: "Yes, speaking." },
-  { who: "agent", text: "Are you looking for investment or self-use?" },
-  { who: "you", text: "Investment, a two bedroom." },
-  { who: "agent", text: "What day and time suits you for a quick Google Meet?" },
-  { who: "you", text: "Tomorrow, around four." },
-] as const;
+type Line =
+  | { kind: "agent" | "you"; text: string }
+  | { kind: "tag"; icon: typeof MessagesSquare; label: string; note: string };
 
-const features = [
-  { icon: MessagesSquare, title: "Understands your needs", text: "Confirms your requirement and answers questions about the project." },
-  { icon: CalendarClock, title: "Books at your time", text: "Turns “tomorrow evening” or “in an hour” into an exact, confirmed slot." },
-  { icon: Languages, title: "Speaks your language", text: "Switches between English, Hindi and Hinglish as you speak." },
+// A sample call. The labels mark the three things the agent is doing at that moment.
+const transcript: Line[] = [
+  { kind: "agent", text: "Hi, this is Rahul. Am I speaking with Rohan?" },
+  { kind: "you", text: "Yes, speaking." },
+  { kind: "agent", text: "Thanks for your enquiry. I see you're looking at a two bedroom for investment, right?" },
+  { kind: "you", text: "Yes. When is the handover?" },
+  { kind: "agent", text: "Handover is planned for the fourth quarter of 2029." },
+  { kind: "tag", icon: MessagesSquare, label: "Understands your needs", note: "Confirms the form details and answers from project facts" },
+  { kind: "you", text: "Achha, payment plan kya hai?" },
+  { kind: "agent", text: "Bahut achha question hai. Exact payment plan hamare advisor aapko Google Meet pe share karenge." },
+  { kind: "tag", icon: Languages, label: "Speaks your language", note: "Switches to Hinglish the moment you do" },
+  { kind: "you", text: "Theek hai, ek ghante baad call kar lo." },
+  { kind: "agent", text: "Toh confirm kar leta hoon: aaj, 5:15 PM, Google Meet. Sahi hai?" },
+  { kind: "you", text: "Haan, sahi hai." },
+  { kind: "tag", icon: CalendarClock, label: "Books at your time", note: "Turns “in an hour” into an exact, confirmed slot" },
 ];
 
 export default function VoiceDemo() {
@@ -55,44 +61,45 @@ export default function VoiceDemo() {
           <DemoCallForm />
         </Reveal>
 
-        <Reveal delay={120} className="flex flex-col gap-6">
-          <div className="relative overflow-hidden rounded-[var(--radius-card)] bg-navy">
+        <Reveal delay={120}>
+          <div className="relative h-full overflow-hidden rounded-[var(--radius-card)] bg-navy">
             <Picture slug="demo-show-apartment" alt="A bright, modern apartment living room" sizes="(min-width: 1024px) 45vw, 100vw" className="absolute inset-0 h-full w-full opacity-45" />
             <div className="absolute inset-0 bg-gradient-to-br from-navy/90 via-navy/70 to-[#3b1d6e]/70" />
             <div className="relative p-7 sm:p-9">
               <p className="text-[12px] font-medium uppercase tracking-[0.16em] text-white/60">What happens on the call</p>
               <Waveform bars={30} className="mt-4" />
               <ul className="mt-6 space-y-3">
-                {transcript.map((m, i) => (
-                  <li key={i} className={`flex ${m.who === "you" ? "justify-end" : "justify-start"}`}>
-                    <span
-                      className={`max-w-[80%] rounded-2xl px-4 py-2.5 text-[14px] ${
-                        m.who === "you" ? "rounded-br-sm bg-white/15 text-white" : "rounded-bl-sm bg-white text-ink"
-                      }`}
-                    >
-                      {m.text}
-                    </span>
-                  </li>
-                ))}
+                {transcript.map((m, i) =>
+                  m.kind === "tag" ? (
+                    <li key={i} className="flex justify-center py-1">
+                      <span className="inline-flex max-w-full items-center gap-2.5 rounded-full border border-white/15 bg-white/[0.06] py-1.5 pl-2 pr-4 text-left backdrop-blur">
+                        <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-gradient-to-br from-arc-orange via-arc-pink to-arc-violet">
+                          <m.icon size={14} className="text-white" aria-hidden="true" />
+                        </span>
+                        <span className="text-[12.5px] leading-tight">
+                          <span className="block font-semibold text-white">{m.label}</span>
+                          <span className="block text-white/60">{m.note}</span>
+                        </span>
+                      </span>
+                    </li>
+                  ) : (
+                    <li key={i} className={`flex ${m.kind === "you" ? "justify-end" : "justify-start"}`}>
+                      <span
+                        className={`max-w-[82%] rounded-2xl px-4 py-2.5 text-[14px] ${
+                          m.kind === "you" ? "rounded-br-sm bg-white/15 text-white" : "rounded-bl-sm bg-white text-ink"
+                        }`}
+                      >
+                        {m.text}
+                      </span>
+                    </li>
+                  ),
+                )}
               </ul>
               <p className="mt-6 inline-flex rounded-full bg-arc-teal px-4 py-2 text-[13px] font-semibold text-navy">
                 Meeting booked ✓
               </p>
             </div>
           </div>
-          <ul className="grid gap-4 sm:grid-cols-3 lg:grid-cols-1">
-            {features.map(({ icon: Icon, title, text }) => (
-              <li key={title} className="card flex gap-4 p-5">
-                <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-white">
-                  <Icon size={19} className="text-arc-pink" />
-                </span>
-                <div>
-                  <p className="font-semibold">{title}</p>
-                  <p className="mt-1 text-[14px] leading-relaxed text-muted">{text}</p>
-                </div>
-              </li>
-            ))}
-          </ul>
         </Reveal>
       </section>
 
