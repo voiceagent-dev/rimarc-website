@@ -12,11 +12,24 @@ const NotFound = lazy(() => import("./pages/NotFound"));
 function ScrollManager() {
   const { pathname, hash } = useLocation();
   useEffect(() => {
-    if (hash) {
-      document.getElementById(hash.slice(1))?.scrollIntoView({ behavior: "smooth" });
-    } else {
+    if (!hash) {
       window.scrollTo({ top: 0 });
+      return;
     }
+    // Pages load on demand, so the target section may not exist yet: keep looking for up to 3 seconds.
+    const id = decodeURIComponent(hash.slice(1));
+    let frame = 0;
+    const started = performance.now();
+    const find = () => {
+      const el = document.getElementById(id);
+      if (el) {
+        el.scrollIntoView({ behavior: "smooth", block: "start" });
+      } else if (performance.now() - started < 3000) {
+        frame = requestAnimationFrame(find);
+      }
+    };
+    find();
+    return () => cancelAnimationFrame(frame);
   }, [pathname, hash]);
   return null;
 }

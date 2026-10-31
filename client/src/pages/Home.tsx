@@ -37,7 +37,7 @@ function Hero() {
             <Link to="/demos/ai-voice-sales-agent" className="btn-primary">
               Try a Live Demo <ArrowRight size={17} />
             </Link>
-            <Link to="/#voice" className="btn-secondary">
+            <Link to="/demos/ai-voice-sales-agent#how-it-works" className="btn-secondary">
               See how it works
             </Link>
           </div>

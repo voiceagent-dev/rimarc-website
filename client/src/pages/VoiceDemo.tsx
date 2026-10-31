@@ -103,7 +103,7 @@ export default function VoiceDemo() {
         </Reveal>
       </section>
 
-      <section className="container-page pb-24">
+      <section id="how-it-works" className="container-page scroll-mt-28 pb-24">
         <Reveal className="card p-8 sm:p-12">
           <Eyebrow>How it works</Eyebrow>
           <ol className="mt-8 grid gap-6 md:grid-cols-4">
