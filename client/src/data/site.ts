@@ -7,8 +7,7 @@ export const SITE = {
 };
 
 export const NAV = [
-  { label: "Services", to: "/#services" },
-  { label: "Live Demos", to: "/#demos" },
+  { label: "Voice AI Demo", to: "/demos/ai-voice-sales-agent" },
   { label: "About", to: "/about" },
   { label: "Contact", to: "/contact" },
 ];

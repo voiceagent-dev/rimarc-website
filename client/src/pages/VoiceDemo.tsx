@@ -29,7 +29,7 @@ export default function VoiceDemo() {
     <>
       <section className="container-page pb-14 pt-10 lg:pt-14">
         <nav aria-label="Breadcrumb" className="text-[14px] text-muted">
-          <Link to="/#demos" className="hover:text-ink">Live Demos</Link>
+          <Link to="/" className="hover:text-ink">Home</Link>
           <span className="mx-2">/</span>
           <span className="text-ink">AI Voice Sales Agent</span>
         </nav>
@@ -113,8 +113,8 @@ export default function VoiceDemo() {
               </li>
             ))}
           </ol>
-          <Link to="/#demos" className="btn-secondary mt-10">
-            <ArrowLeft size={16} /> Back to all demos
+          <Link to="/" className="btn-secondary mt-10">
+            <ArrowLeft size={16} /> Back to home
           </Link>
         </Reveal>
       </section>
