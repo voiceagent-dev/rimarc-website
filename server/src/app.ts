@@ -26,6 +26,18 @@ export function createApp(cfg: Config, log: Logger) {
       autoLogging: { ignore: (req) => !String(req.url).startsWith("/api") },
     }),
   );
+  // Send www.rimarcai.com (and any other subdomain alias) to the main address with one permanent redirect.
+  if (cfg.CANONICAL_HOST) {
+    const canonical = cfg.CANONICAL_HOST;
+    app.use((req, res, next) => {
+      const host = req.hostname;
+      if (host !== canonical && host.endsWith(`.${canonical}`) && (req.method === "GET" || req.method === "HEAD")) {
+        res.redirect(301, `https://${canonical}${req.originalUrl}`);
+        return;
+      }
+      next();
+    });
+  }
   app.use(securityHeaders(cfg));
   app.use(permissionsPolicy);
   app.use(compression());

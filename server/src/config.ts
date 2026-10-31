@@ -8,8 +8,10 @@ const EnvSchema = z
   .object({
     NODE_ENV: z.enum(["development", "production", "test"]).default("development"),
     PORT: z.coerce.number().int().min(1).max(65535).default(8080),
-    // Origins allowed to call the API, e.g. "https://www.rimarcai.com,https://rimarcai.com"
+    // Origins allowed to call the API, e.g. "https://rimarcai.com,https://www.rimarcai.com"
     PUBLIC_ORIGINS: z.string().default("http://localhost:5173,http://localhost:8080").transform(csv),
+    // Main address. Visits to other hosts that end with it (e.g. www.rimarcai.com) are redirected here.
+    CANONICAL_HOST: z.string().regex(/^[a-z0-9.-]+$/).optional(),
     // Number of proxies in front of the app (e.g. 1 behind a load balancer). Needed for correct client IPs.
     TRUST_PROXY: z.coerce.number().int().min(0).max(5).default(0),
 
