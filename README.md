@@ -88,3 +88,16 @@ Notes:
 ## Images
 
 `npm run images` downloads the photos listed in `scripts/optimize-images.mjs` and regenerates the AVIF/WebP files. Each photo slug is used in exactly one place on the site. (If Node can't reach Unsplash through a proxy, download the files into `scripts/.source-images/<slug>.jpg` first and rerun.)
+
+## Search engines (SEO)
+
+Every page is pre-rendered to real HTML at build time (`client/scripts/prerender.mjs`), with its own
+title, description and canonical link from `client/src/data/seo.ts`. The build also writes
+`sitemap.xml`. To add a page: add its route in `App.tsx` and an entry in `seo.ts`.
+
+To get the site into Google:
+
+1. Go to https://search.google.com/search-console, choose **Domain** and enter `rimarcai.com`.
+2. Copy the `google-site-verification=...` TXT record, add it in GoDaddy DNS (Type TXT, Name `@`), then click **Verify**.
+3. In **Sitemaps**, submit `https://www.rimarcai.com/sitemap.xml`.
+4. In **URL inspection**, enter `https://www.rimarcai.com/` and click **Request indexing**.

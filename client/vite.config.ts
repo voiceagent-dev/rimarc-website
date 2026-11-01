@@ -2,7 +2,7 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 
-export default defineConfig({
+export default defineConfig(({ isSsrBuild }) => ({
   plugins: [react(), tailwindcss()],
   server: {
     port: 5173,
@@ -15,8 +15,9 @@ export default defineConfig({
     cssCodeSplit: true,
     rollupOptions: {
       output: {
-        manualChunks: { react: ["react", "react-dom", "react-router"] },
+        // The build-time pre-render bundle (--ssr) keeps React as an external package instead.
+        manualChunks: isSsrBuild ? undefined : { react: ["react", "react-dom", "react-router"] },
       },
     },
   },
-});
+}));

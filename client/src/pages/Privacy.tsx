@@ -1,6 +1,6 @@
 import { Eyebrow } from "../components/Brand";
 import { SITE } from "../data/site";
-import { usePageTitle } from "../lib/usePageTitle";
+import { usePageMeta } from "../lib/usePageMeta";
 
 const sections: [string, string[]][] = [
   [
@@ -44,7 +44,7 @@ const sections: [string, string[]][] = [
 ];
 
 export default function Privacy() {
-  usePageTitle("Privacy Policy · RIMARC AI");
+  usePageMeta("/privacy");
   return (
     <section className="container-page max-w-3xl pb-24 pt-12 lg:pt-20">
       <Eyebrow>Privacy Policy</Eyebrow>

@@ -7,3 +7,4 @@ dist/
 .DS_Store
 scripts/.source-images/
 client/tsconfig.tsbuildinfo
+client/dist-ssr

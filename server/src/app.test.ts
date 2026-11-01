@@ -249,3 +249,37 @@ test("n8n mode refuses to start without a webhook URL and secret", () => {
     loadConfig({ HASH_SECRET: "x".repeat(40), DEMO_CALL_MODE: "n8n", N8N_DEMO_WEBHOOK_URL: "https://x.app.n8n.cloud/webhook/a" }),
   );
 });
+
+test("serves pre-rendered pages, trims trailing slashes and returns a real 404", async () => {
+  const { mkdtemp, mkdir, writeFile } = await import("node:fs/promises");
+  const os = await import("node:os");
+  const path = await import("node:path");
+  const dir = await mkdtemp(path.join(os.tmpdir(), "rimarc-dist-"));
+  await mkdir(path.join(dir, "about"), { recursive: true });
+  await writeFile(path.join(dir, "index.html"), "<p>home page</p>");
+  await writeFile(path.join(dir, "about", "index.html"), "<p>about page</p>");
+  await writeFile(path.join(dir, "404.html"), "<p>not found page</p>");
+
+  const cfg = loadConfig({ NODE_ENV: "test", HASH_SECRET: "test-secret-that-is-long-enough-123456", CLIENT_DIST: dir });
+  const app = createApp(cfg, createLogger("test")).listen(0);
+  await new Promise((r) => app.once("listening", r));
+  const site = `http://127.0.0.1:${(app.address() as AddressInfo).port}`;
+  try {
+    const home = await fetch(site + "/");
+    assert.equal(home.status, 200);
+    assert.match(await home.text(), /home page/);
+    const about = await fetch(site + "/about");
+    assert.equal(about.status, 200);
+    assert.match(await about.text(), /about page/);
+    assert.equal(about.headers.get("cache-control"), "no-cache");
+    const slash = await fetch(site + "/about/?ref=x", { redirect: "manual" });
+    assert.equal(slash.status, 301);
+    assert.equal(slash.headers.get("location"), "/about?ref=x");
+    const missing = await fetch(site + "/no-such-page");
+    assert.equal(missing.status, 404);
+    assert.match(await missing.text(), /not found page/);
+    assert.equal((await fetch(site + "/../etc/passwd")).status, 404);
+  } finally {
+    app.close();
+  }
+});

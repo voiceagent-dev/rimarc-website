@@ -3,12 +3,12 @@ import { ArrowRight, Compass, Eye, HeartHandshake, Lightbulb, Rocket, ShieldChec
 import Picture from "../components/Picture";
 import { Eyebrow, Reveal } from "../components/Brand";
 import { VALUES } from "../data/services";
-import { usePageTitle } from "../lib/usePageTitle";
+import { usePageMeta } from "../lib/usePageMeta";
 
 const valueIcons = [Lightbulb, Target, Users, ShieldCheck, Sparkles, HeartHandshake];
 
 export default function About() {
-  usePageTitle("About · RIMARC AI", "RIMARC AI helps businesses embrace intelligent operations with AI agents and automation.");
+  usePageMeta("/about");
   return (
     <>
       <section className="container-page grid items-center gap-12 pb-20 pt-12 lg:grid-cols-2 lg:pt-20">

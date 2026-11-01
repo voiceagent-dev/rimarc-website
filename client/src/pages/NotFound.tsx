@@ -1,9 +1,9 @@
 import { Link } from "react-router";
 import { Arc } from "../components/Brand";
-import { usePageTitle } from "../lib/usePageTitle";
+import { usePageMeta } from "../lib/usePageMeta";
 
 export default function NotFound() {
-  usePageTitle("Page not found · RIMARC AI");
+  usePageMeta("/404");
   return (
     <section className="container-page flex min-h-[60vh] flex-col items-center justify-center py-24 text-center">
       <Arc className="h-16 w-full max-w-md" />

@@ -3,10 +3,10 @@ import ContactForm from "../components/ContactForm";
 import Picture from "../components/Picture";
 import { Arc, Eyebrow, Reveal } from "../components/Brand";
 import { SITE } from "../data/site";
-import { usePageTitle } from "../lib/usePageTitle";
+import { usePageMeta } from "../lib/usePageMeta";
 
 export default function Contact() {
-  usePageTitle("Contact · RIMARC AI", "Tell us what you'd like to automate. We reply within one working day.");
+  usePageMeta("/contact");
   return (
     <section className="container-page grid gap-12 pb-24 pt-12 lg:grid-cols-[1fr_1.1fr] lg:pt-20">
       <Reveal>

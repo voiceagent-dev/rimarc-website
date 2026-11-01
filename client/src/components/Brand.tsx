@@ -87,17 +87,23 @@ export function Eyebrow({ children }: { children: ReactNode }) {
   return <p className="eyebrow">{children}</p>;
 }
 
-/** Fades content in as it scrolls into view. */
+/**
+ * Fades content in as it scrolls into view. Content is visible in the pre-rendered HTML, so the page
+ * shows instantly (and search engines see it). After the page loads, only sections still below the
+ * fold are hidden and then faded in as the visitor scrolls to them.
+ */
 export function Reveal({ children, className = "", delay = 0 }: { children: ReactNode; className?: string; delay?: number }) {
   const ref = useRef<HTMLDivElement>(null);
-  const [visible, setVisible] = useState(false);
+  const [state, setState] = useState<"static" | "hidden" | "visible">("static");
   useEffect(() => {
     const el = ref.current;
-    if (!el) return;
+    if (!el || typeof IntersectionObserver === "undefined") return;
+    if (el.getBoundingClientRect().top < window.innerHeight * 0.9) return; // already on screen: leave as is
+    setState("hidden");
     const obs = new IntersectionObserver(
       ([entry]) => {
         if (entry?.isIntersecting) {
-          setVisible(true);
+          setState("visible");
           obs.disconnect();
         }
       },
@@ -106,8 +112,9 @@ export function Reveal({ children, className = "", delay = 0 }: { children: Reac
     obs.observe(el);
     return () => obs.disconnect();
   }, []);
+  const cls = state === "static" ? "" : `reveal ${state === "visible" ? "is-visible" : ""}`;
   return (
-    <div ref={ref} className={`reveal ${visible ? "is-visible" : ""} ${className}`} style={{ transitionDelay: `${delay}ms` }}>
+    <div ref={ref} className={`${cls} ${className}`.trim()} style={state === "static" ? undefined : { transitionDelay: `${delay}ms` }}>
       {children}
     </div>
   );

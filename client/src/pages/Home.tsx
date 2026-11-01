@@ -3,12 +3,12 @@ import { ArrowRight, KeyRound, Lock, ShieldCheck, UserCheck } from "lucide-react
 import Picture from "../components/Picture";
 import PhoneMockup from "../components/PhoneMockup";
 import { Arc, Eyebrow, Reveal } from "../components/Brand";
-import { usePageTitle } from "../lib/usePageTitle";
+import { usePageMeta } from "../lib/usePageMeta";
 import WhatItSolves from "../sections/WhatItSolves";
 import HeroAnimation from "../components/HeroAnimation";
 
 export default function Home() {
-  usePageTitle("RIMARC AI · Automate Beyond Limits");
+  usePageMeta("/");
   return (
     <>
       <Hero />

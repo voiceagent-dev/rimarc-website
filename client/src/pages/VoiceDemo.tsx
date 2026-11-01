@@ -3,7 +3,7 @@ import { ArrowLeft, CalendarClock, Languages, MessagesSquare } from "lucide-reac
 import DemoCallForm from "../components/DemoCallForm";
 import Picture from "../components/Picture";
 import { Eyebrow, Reveal, Waveform } from "../components/Brand";
-import { usePageTitle } from "../lib/usePageTitle";
+import { usePageMeta } from "../lib/usePageMeta";
 
 type Line =
   | { kind: "agent" | "you"; text: string }
@@ -27,10 +27,7 @@ const transcript: Line[] = [
 ];
 
 export default function VoiceDemo() {
-  usePageTitle(
-    "AI Voice Sales Agent · Live Demo · RIMARC AI",
-    "Enter your details and get a live call from our AI voice sales agent within a minute.",
-  );
+  usePageMeta("/demos/ai-voice-sales-agent");
   return (
     <>
       <section className="container-page pb-14 pt-10 lg:pt-14">

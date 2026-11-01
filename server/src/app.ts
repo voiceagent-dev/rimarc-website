@@ -34,7 +34,9 @@ export function createApp(cfg: Config, log: Logger) {
     app.use((req, res, next) => {
       const host = req.hostname;
       const sameSite = host === base || host.endsWith(`.${base}`);
-      if (host !== canonical && sameSite && (req.method === "GET" || req.method === "HEAD")) {
+      // The free *.onrender.com address would be a duplicate copy of the site in Google.
+      const renderHost = host.endsWith(".onrender.com") && !req.path.startsWith("/api/");
+      if (host !== canonical && (sameSite || renderHost) && (req.method === "GET" || req.method === "HEAD")) {
         res.redirect(301, `https://${canonical}${req.originalUrl}`);
         return;
       }
@@ -74,11 +76,38 @@ export function createApp(cfg: Config, log: Logger) {
       "/assets",
       express.static(path.join(dist, "assets"), { immutable: true, maxAge: "1y", index: false, dotfiles: "deny" }),
     );
-    app.use(express.static(dist, { maxAge: "1d", index: false, dotfiles: "deny" }));
-    // Single-page app: every other GET returns index.html.
-    app.get(/.*/, (_req, res) => {
+    app.use(express.static(dist, { maxAge: "1d", index: false, dotfiles: "deny", redirect: false }));
+
+    // Every page is pre-rendered to its own HTML file at build time (client/scripts/prerender.mjs).
+    // Paths are limited to lowercase letters, digits, "-" and "/", so they can't leave the dist folder.
+    const pageCache = new Map<string, string | null>();
+    const pageFor = (urlPath: string) => {
+      if (!/^\/[a-z0-9\-/]*$/.test(urlPath) || urlPath.includes("//")) return null;
+      if (!pageCache.has(urlPath)) {
+        const file = path.join(dist, urlPath === "/" ? "index.html" : path.join(urlPath.slice(1), "index.html"));
+        pageCache.set(urlPath, existsSync(file) ? file : null);
+      }
+      return pageCache.get(urlPath) ?? null;
+    };
+    const notFoundPage = existsSync(path.join(dist, "404.html")) ? path.join(dist, "404.html") : path.join(dist, "index.html");
+
+    app.get(/.*/, (req, res) => {
       res.setHeader("Cache-Control", "no-cache");
-      res.sendFile(path.join(dist, "index.html"));
+      // One address per page: "/about/" -> "/about".
+      if (req.path.length > 1 && req.path.endsWith("/")) {
+        const trimmed = req.path.replace(/\/+$/, "");
+        if (pageFor(trimmed)) {
+          const q = req.originalUrl.indexOf("?");
+          res.redirect(301, trimmed + (q === -1 ? "" : req.originalUrl.slice(q)));
+          return;
+        }
+      }
+      const file = pageFor(req.path);
+      if (file) {
+        res.sendFile(file);
+        return;
+      }
+      res.status(404).sendFile(notFoundPage);
     });
   }
 
