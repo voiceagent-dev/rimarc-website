@@ -32,6 +32,7 @@ export type CallResult = { ok: true; callId: string } | { ok: false; status: num
 export async function startVapiCall(cfg: Config, input: DemoCallInput, e164: string): Promise<CallResult> {
   if (cfg.DEMO_CALL_MODE === "mock") return { ok: true, callId: "mock-call" };
   if (cfg.DEMO_CALL_MODE === "n8n") return sendToN8n(cfg, input, e164);
+  if (cfg.DEMO_CALL_MODE === "sheet") return saveToSheet(cfg, input, e164);
 
   const firstName = input.full_name.split(" ")[0] ?? input.full_name;
   const res = await postJson(
@@ -109,4 +110,33 @@ async function sendToN8n(cfg: Config, input: DemoCallInput, e164: string): Promi
   );
   if (!res.ok) return { ok: false, status: res.status };
   return { ok: true, callId: "n8n" };
+}
+
+/**
+ * Sheet mode: no call is placed. The validated request is saved as a row in a Google Sheet by a
+ * Google Apps Script web app (google-sheets/demo-leads.gs). Apps Script can't read request headers,
+ * so the shared secret travels in the body, over HTTPS, server to server only.
+ */
+async function saveToSheet(cfg: Config, input: DemoCallInput, e164: string): Promise<CallResult> {
+  const res = await fetch(cfg.SHEET_WEBHOOK_URL!, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      secret: cfg.OUTBOUND_WEBHOOK_SECRET,
+      full_name: input.full_name,
+      email: input.email,
+      phone_number: e164,
+      location: input.location,
+      purpose: input.purpose,
+      configuration: input.configuration,
+      consent: true,
+      source: "rimarcai.com demo form",
+    }),
+    signal: AbortSignal.timeout(15_000),
+    // Apps Script answers with a redirect to the script's output on googleusercontent.com.
+    redirect: "follow",
+  });
+  if (!res.ok) return { ok: false, status: res.status };
+  const data = (await res.json().catch(() => ({}))) as { ok?: unknown };
+  return data.ok === true ? { ok: true, callId: "sheet" } : { ok: false, status: 502 };
 }

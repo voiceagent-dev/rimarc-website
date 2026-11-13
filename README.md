@@ -101,3 +101,16 @@ To get the site into Google:
 2. Copy the `google-site-verification=...` TXT record, add it in GoDaddy DNS (Type TXT, Name `@`), then click **Verify**.
 3. In **Sitemaps**, submit `https://www.rimarcai.com/sitemap.xml`.
 4. In **URL inspection**, enter `https://www.rimarcai.com/` and click **Request indexing**.
+
+## Save demo form submissions to a Google Sheet (no call)
+
+`DEMO_CALL_MODE=sheet` saves each validated demo request as a row in the Google Sheet
+"RIMARC Website Demo Leads" (tab `Leads`) and places no call. Any country's mobile number is
+accepted and calling hours don't apply. Bot checks, rate limits and the 24-hour duplicate check still run.
+
+1. Open the sheet → **Extensions → Apps Script**, replace `Code.gs` with `google-sheets/demo-leads.gs`,
+   and set `SECRET` to a long random value (`openssl rand -hex 24`). Save.
+2. **Deploy → New deployment → Web app**. Execute as **Me**, access **Anyone**. Authorise and copy the Web app URL.
+3. In Render → Environment set `DEMO_CALL_MODE=sheet`, `SHEET_WEBHOOK_URL=<Web app URL>` and
+   `OUTBOUND_WEBHOOK_SECRET=<the same SECRET>`, then save (Render redeploys).
+4. Submit the form on the website once and check that a row appears.

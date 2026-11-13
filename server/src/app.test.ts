@@ -283,3 +283,71 @@ test("serves pre-rendered pages, trims trailing slashes and returns a real 404",
     app.close();
   }
 });
+
+test("sheet mode saves the request to the Google Sheet script and places no call", async () => {
+  const { createServer } = await import("node:http");
+  let received: Record<string, unknown> | undefined;
+  let accept = true;
+  // Imitates Apps Script: the POST is answered with a redirect, and the output is served at the new address.
+  const script = createServer((req, res) => {
+    if (req.method === "POST" && req.url === "/macros/s/abc/exec") {
+      let raw = "";
+      req.on("data", (c) => (raw += c));
+      req.on("end", () => {
+        received = JSON.parse(raw);
+        res.writeHead(302, { Location: "/echo" }).end();
+      });
+      return;
+    }
+    res.writeHead(200, { "Content-Type": "application/json" }).end(JSON.stringify({ ok: accept }));
+  }).listen(0);
+  await new Promise((r) => script.once("listening", r));
+  const url = `http://127.0.0.1:${(script.address() as AddressInfo).port}/macros/s/abc/exec`;
+
+  const cfg = loadConfig({
+    NODE_ENV: "test",
+    HASH_SECRET: "test-secret-that-is-long-enough-123456",
+    DEMO_CALL_MODE: "sheet",
+    SHEET_WEBHOOK_URL: url,
+    OUTBOUND_WEBHOOK_SECRET: "sheet-shared-secret-0123456789",
+    // Outside calling hours: sheet mode must still accept the request.
+    CALL_WINDOW_START_HOUR: "0",
+    CALL_WINDOW_END_HOUR: "1",
+    CLIENT_DIST: "/nonexistent",
+  });
+  const app = createApp(cfg, createLogger("test")).listen(0);
+  await new Promise((r) => app.once("listening", r));
+  const api = `http://127.0.0.1:${(app.address() as AddressInfo).port}/api/demo-call`;
+  const send = (over: Record<string, unknown>) =>
+    fetch(api, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Origin: ORIGIN, "X-Requested-With": "rimarc-web" },
+      body: JSON.stringify(goodForm(over)),
+    });
+  try {
+    // A UAE mobile number is fine in sheet mode, because nothing is dialled.
+    const ok = await send({ email: "sheet@example.com", dial_code: "+971", phone_number: "50 123 4567", location: "Middle East" });
+    assert.equal(ok.status, 202);
+    assert.match(((await ok.json()) as { message: string }).message, /received your details/);
+    assert.ok(received, "sheet script was called");
+    assert.equal(received.secret, "sheet-shared-secret-0123456789");
+    assert.equal(received.full_name, "Stevie Mehta");
+    assert.equal(received.phone_number, "+971501234567");
+    assert.equal(received.location, "Middle East");
+
+    accept = false; // the script refuses (for example, a wrong secret)
+    const refused = await send({ email: "sheet2@example.com", phone_number: "91234 56780" });
+    assert.equal(refused.status, 502);
+    assert.match(((await refused.json()) as { error: string }).error, /couldn't save/);
+  } finally {
+    app.close();
+    script.close();
+  }
+});
+
+test("sheet mode refuses to start without the script URL and secret", () => {
+  assert.throws(() => loadConfig({ HASH_SECRET: "x".repeat(40), DEMO_CALL_MODE: "sheet" }));
+  assert.throws(() =>
+    loadConfig({ HASH_SECRET: "x".repeat(40), DEMO_CALL_MODE: "sheet", SHEET_WEBHOOK_URL: "https://script.google.com/macros/s/a/exec" }),
+  );
+});

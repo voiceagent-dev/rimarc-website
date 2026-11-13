@@ -16,9 +16,12 @@ const EnvSchema = z
     TRUST_PROXY: z.coerce.number().int().min(0).max(5).default(0),
 
     // "mock" never places real calls (safe for local development); "live" calls Vapi directly;
-    // "n8n" sends each validated request to an n8n webhook, which places the call.
-    DEMO_CALL_MODE: z.enum(["mock", "live", "n8n"]).default("mock"),
+    // "n8n" sends each validated request to an n8n webhook, which places the call;
+    // "sheet" places no call and saves each request as a row in a Google Sheet (via Apps Script).
+    DEMO_CALL_MODE: z.enum(["mock", "live", "n8n", "sheet"]).default("mock"),
     N8N_DEMO_WEBHOOK_URL: z.string().url().optional(),
+    // Google Apps Script web app URL (ends in /exec) that appends rows to the leads sheet.
+    SHEET_WEBHOOK_URL: z.string().url().optional(),
     VAPI_API_KEY: z.string().optional(),
     VAPI_ASSISTANT_ID: z.string().optional(),
     VAPI_PHONE_NUMBER_ID: z.string().optional(),
@@ -61,6 +64,14 @@ const EnvSchema = z
         ctx.addIssue({ code: "custom", path: ["N8N_DEMO_WEBHOOK_URL"], message: "N8N_DEMO_WEBHOOK_URL must use https" });
       if (!env.OUTBOUND_WEBHOOK_SECRET || env.OUTBOUND_WEBHOOK_SECRET.length < 24)
         ctx.addIssue({ code: "custom", path: ["OUTBOUND_WEBHOOK_SECRET"], message: "Set OUTBOUND_WEBHOOK_SECRET (24+ characters) so n8n can verify requests" });
+    }
+    if (env.DEMO_CALL_MODE === "sheet") {
+      if (!env.SHEET_WEBHOOK_URL)
+        ctx.addIssue({ code: "custom", path: ["SHEET_WEBHOOK_URL"], message: "SHEET_WEBHOOK_URL is required when DEMO_CALL_MODE=sheet" });
+      else if (!env.SHEET_WEBHOOK_URL.startsWith("https://") && env.NODE_ENV === "production")
+        ctx.addIssue({ code: "custom", path: ["SHEET_WEBHOOK_URL"], message: "SHEET_WEBHOOK_URL must use https" });
+      if (!env.OUTBOUND_WEBHOOK_SECRET || env.OUTBOUND_WEBHOOK_SECRET.length < 24)
+        ctx.addIssue({ code: "custom", path: ["OUTBOUND_WEBHOOK_SECRET"], message: "Set OUTBOUND_WEBHOOK_SECRET (24+ characters) so the sheet script can verify requests" });
     }
     if (env.NODE_ENV === "production" && env.PUBLIC_ORIGINS.some((o) => o.startsWith("http://"))) {
       ctx.addIssue({ code: "custom", path: ["PUBLIC_ORIGINS"], message: "Production origins must use https" });

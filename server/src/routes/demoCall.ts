@@ -37,7 +37,9 @@ export function demoCallRouter(cfg: Config, log: Logger, limiters: Limiters) {
       return;
     }
 
-    const phone = checkPhone(input.dial_code, input.phone_number, cfg.ALLOWED_CALL_COUNTRIES);
+    // In sheet mode nothing is dialled, so any country's mobile number is accepted and saved.
+    const saveOnly = cfg.DEMO_CALL_MODE === "sheet";
+    const phone = checkPhone(input.dial_code, input.phone_number, saveOnly ? "any" : cfg.ALLOWED_CALL_COUNTRIES);
     if (!phone.ok) {
       const msg =
         phone.reason === "country_not_allowed"
@@ -49,7 +51,7 @@ export function demoCallRouter(cfg: Config, log: Logger, limiters: Limiters) {
       return;
     }
 
-    if (!withinCallingHours(cfg.CALL_TIMEZONE, cfg.CALL_WINDOW_START_HOUR, cfg.CALL_WINDOW_END_HOUR)) {
+    if (!saveOnly && !withinCallingHours(cfg.CALL_TIMEZONE, cfg.CALL_WINDOW_START_HOUR, cfg.CALL_WINDOW_END_HOUR)) {
       res.status(409).json({
         error: `Demo calls run between ${cfg.CALL_WINDOW_START_HOUR}:00 and ${cfg.CALL_WINDOW_END_HOUR}:00 India time. Please try again then.`,
       });
@@ -59,7 +61,9 @@ export function demoCallRouter(cfg: Config, log: Logger, limiters: Limiters) {
     const phoneKey = keyedHash(cfg.HASH_SECRET, phone.e164);
     const emailKey = keyedHash(cfg.HASH_SECRET, input.email);
     if (recentPhones.has(phoneKey) || recentEmails.has(emailKey)) {
-      res.status(429).json({ error: "We've already sent a demo call to these details today." });
+      res.status(429).json({
+        error: saveOnly ? "We've already received your request today. Our team will be in touch." : "We've already sent a demo call to these details today.",
+      });
       return;
     }
     // Reserve before calling so two quick submissions can't both get through.
@@ -71,8 +75,10 @@ export function demoCallRouter(cfg: Config, log: Logger, limiters: Limiters) {
       if (!result.ok) {
         recentPhones.delete(phoneKey);
         recentEmails.delete(emailKey);
-        log.error({ status: result.status, phone: maskPhone(phone.e164) }, "vapi call failed");
-        res.status(502).json({ error: "We couldn't start the call right now. Please try again in a few minutes." });
+        log.error({ status: result.status, phone: maskPhone(phone.e164), mode: cfg.DEMO_CALL_MODE }, "demo request failed");
+        res.status(502).json({
+          error: saveOnly ? "We couldn't save your request right now. Please try again in a few minutes." : "We couldn't start the call right now. Please try again in a few minutes.",
+        });
         return;
       }
       log.info({ callId: result.callId, phone: maskPhone(phone.e164), mode: cfg.DEMO_CALL_MODE }, "demo call started");
@@ -82,13 +88,17 @@ export function demoCallRouter(cfg: Config, log: Logger, limiters: Limiters) {
         message:
           cfg.DEMO_CALL_MODE === "mock"
             ? "Test mode: the form works, but no real call was placed."
-            : "Your demo call is on its way. Please keep your phone nearby.",
+            : saveOnly
+              ? "Thanks! We've received your details. Our team will contact you shortly to set up your demo."
+              : "Your demo call is on its way. Please keep your phone nearby.",
       });
     } catch (err) {
       recentPhones.delete(phoneKey);
       recentEmails.delete(emailKey);
-      log.error({ err: (err as Error).name }, "vapi call error");
-      res.status(502).json({ error: "We couldn't start the call right now. Please try again in a few minutes." });
+      log.error({ err: (err as Error).name, mode: cfg.DEMO_CALL_MODE }, "demo request error");
+      res.status(502).json({
+        error: saveOnly ? "We couldn't save your request right now. Please try again in a few minutes." : "We couldn't start the call right now. Please try again in a few minutes.",
+      });
     }
   });
 
