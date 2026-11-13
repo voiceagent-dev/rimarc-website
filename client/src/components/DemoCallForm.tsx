@@ -1,7 +1,7 @@
 import { useMemo, useState, type FormEvent } from "react";
 import { CheckCircle2, Loader2, PhoneCall } from "lucide-react";
 import { CONFIGURATIONS, DIAL_CODES, LOCATIONS, PURPOSES } from "../data/formOptions";
-import { formTimer, postJson } from "../lib/api";
+import { formTimer, submitForm } from "../lib/api";
 import { Arc } from "./Brand";
 
 type Status = { kind: "idle" } | { kind: "sending" } | { kind: "done"; message: string } | { kind: "error"; message: string };
@@ -39,7 +39,7 @@ export default function DemoCallForm() {
     if (!payload.consent) return setStatus({ kind: "error", message: "Please agree to receive the demo call." });
 
     setStatus({ kind: "sending" });
-    const res = await postJson("/api/demo-call", payload);
+    const res = await submitForm("demo", payload);
     setStatus(res.ok ? { kind: "done", message: res.message } : { kind: "error", message: res.error });
   }
 

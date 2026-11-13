@@ -1,6 +1,6 @@
 import { useMemo, useState, type FormEvent } from "react";
 import { CheckCircle2, Loader2, Send } from "lucide-react";
-import { formTimer, postJson } from "../lib/api";
+import { formTimer, submitForm } from "../lib/api";
 
 type Status = { kind: "idle" } | { kind: "sending" } | { kind: "done"; message: string } | { kind: "error"; message: string };
 
@@ -24,7 +24,7 @@ export default function ContactForm() {
     if (payload.message.length < 10) return setStatus({ kind: "error", message: "Please write a little more." });
     if (!payload.consent) return setStatus({ kind: "error", message: "Please agree to be contacted." });
     setStatus({ kind: "sending" });
-    const res = await postJson("/api/contact", payload);
+    const res = await submitForm("contact", payload);
     setStatus(res.ok ? { kind: "done", message: res.message } : { kind: "error", message: res.error });
   }
 

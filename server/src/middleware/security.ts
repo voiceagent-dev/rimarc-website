@@ -18,7 +18,8 @@ export function securityHeaders(cfg: Config): RequestHandler {
         styleSrcAttr: ["'unsafe-inline'"],
         imgSrc: ["'self'", "data:"],
         fontSrc: ["'self'"],
-        connectSrc: ["'self'"],
+        // The forms can also post straight to the Google Apps Script that saves leads to the sheet.
+        connectSrc: ["'self'", "https://script.google.com", "https://script.googleusercontent.com"],
         frameSrc: turnstile.length ? turnstile : ["'none'"],
         objectSrc: ["'none'"],
         baseUri: ["'self'"],

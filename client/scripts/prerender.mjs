@@ -62,7 +62,8 @@ function pageHtml(route) {
 }
 
 for (const route of Object.keys(PAGES)) {
-  const file = route === "/" ? "index.html" : route === "/404" ? "404.html" : path.join(route.slice(1), "index.html");
+  // "/about" -> about.html: GitHub Pages serves it at /about (a folder would force a redirect to /about/).
+  const file = route === "/" ? "index.html" : route === "/404" ? "404.html" : `${route.slice(1)}.html`;
   const out = path.join(dist, file);
   await mkdir(path.dirname(out), { recursive: true });
   await writeFile(out, pageHtml(route));

@@ -251,13 +251,12 @@ test("n8n mode refuses to start without a webhook URL and secret", () => {
 });
 
 test("serves pre-rendered pages, trims trailing slashes and returns a real 404", async () => {
-  const { mkdtemp, mkdir, writeFile } = await import("node:fs/promises");
+  const { mkdtemp, writeFile } = await import("node:fs/promises");
   const os = await import("node:os");
   const path = await import("node:path");
   const dir = await mkdtemp(path.join(os.tmpdir(), "rimarc-dist-"));
-  await mkdir(path.join(dir, "about"), { recursive: true });
   await writeFile(path.join(dir, "index.html"), "<p>home page</p>");
-  await writeFile(path.join(dir, "about", "index.html"), "<p>about page</p>");
+  await writeFile(path.join(dir, "about.html"), "<p>about page</p>");
   await writeFile(path.join(dir, "404.html"), "<p>not found page</p>");
 
   const cfg = loadConfig({ NODE_ENV: "test", HASH_SECRET: "test-secret-that-is-long-enough-123456", CLIENT_DIST: dir });

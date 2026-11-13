@@ -84,8 +84,11 @@ export function createApp(cfg: Config, log: Logger) {
     const pageFor = (urlPath: string) => {
       if (!/^\/[a-z0-9\-/]*$/.test(urlPath) || urlPath.includes("//")) return null;
       if (!pageCache.has(urlPath)) {
-        const file = path.join(dist, urlPath === "/" ? "index.html" : path.join(urlPath.slice(1), "index.html"));
-        pageCache.set(urlPath, existsSync(file) ? file : null);
+        // Pages are written as "about.html" (the GitHub Pages layout) or, in older builds, "about/index.html".
+        const candidates =
+          urlPath === "/" ? ["index.html"] : [`${urlPath.slice(1)}.html`, path.join(urlPath.slice(1), "index.html")];
+        const found = candidates.map((c) => path.join(dist, c)).find((f) => existsSync(f));
+        pageCache.set(urlPath, found ?? null);
       }
       return pageCache.get(urlPath) ?? null;
     };

@@ -114,3 +114,14 @@ accepted and calling hours don't apply. Bot checks, rate limits and the 24-hour 
 3. In Render → Environment set `DEMO_CALL_MODE=sheet`, `SHEET_WEBHOOK_URL=<Web app URL>` and
    `OUTBOUND_WEBHOOK_SECRET=<the same SECRET>`, then save (Render redeploys).
 4. Submit the form on the website once and check that a row appears.
+
+## Hosting on GitHub Pages (current)
+
+The site is published as static files to GitHub Pages by `.github/workflows/pages.yml` on every push to `main`.
+Both forms post straight to the Google Apps Script in `google-sheets/demo-leads.gs` (`VITE_LEADS_URL` in the workflow),
+which validates them and saves them to the "Leads" and "Contact" tabs. The Node server in `server/` is not used there;
+it remains for hosts that run Node (Render, Cloud Run), where the forms fall back to `/api` if `VITE_LEADS_URL` is unset.
+
+GoDaddy DNS for GitHub Pages: four A records for `@` (185.199.108.153, 185.199.109.153, 185.199.110.153,
+185.199.111.153) and a CNAME `www` → `voiceagent-dev.github.io`. Custom domain `www.rimarcai.com` with
+"Enforce HTTPS" in the repository's Settings → Pages.
