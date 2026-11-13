@@ -6,8 +6,8 @@ export const SITE = {
   linkedin: "https://www.linkedin.com/company/rimarc-ai",
 };
 
+// The demo is reached through the single "Try a Live Demo" button, so it isn't repeated in the menu.
 export const NAV = [
-  { label: "Voice AI Demo", to: "/demos/ai-voice-sales-agent" },
   { label: "About", to: "/about" },
   { label: "Contact", to: "/contact" },
 ];

@@ -4,27 +4,35 @@ import { ArrowRight, Linkedin, Mail, Menu, X } from "lucide-react";
 import { Logo } from "./Brand";
 import { NAV, SITE } from "../data/site";
 
-function AnnouncementBar() {
-  return (
-    <div className="bg-ink text-white">
-      <div className="container-page flex h-11 items-center justify-center gap-3 text-[13px] sm:text-sm">
-        <span className="pulse-dot h-2 w-2 rounded-full bg-arc-teal" aria-hidden="true" />
-        <span>New: Try our live AI Voice Sales Agent</span>
-        <Link
-          to="/demos/ai-voice-sales-agent"
-          className="rounded-full bg-white px-3 py-1 text-[12px] font-medium text-ink transition hover:bg-white/85"
-        >
-          Try it
-        </Link>
-      </div>
-    </div>
-  );
+const DEMO_PATH = "/demos/ai-voice-sales-agent";
+
+/**
+ * One demo button on screen at a time: the header's "Try a Live Demo" hides while a page's own demo
+ * button (marked data-demo-cta) is visible, and on the demo page itself.
+ */
+function useHeaderCtaVisible(pathname: string) {
+  // Start hidden on the home page (its hero button is on screen at load) to avoid a flash.
+  const [visible, setVisible] = useState(pathname !== "/" && pathname !== DEMO_PATH);
+  useEffect(() => {
+    if (pathname === DEMO_PATH) return setVisible(false);
+    const targets = Array.from(document.querySelectorAll("[data-demo-cta]"));
+    if (!targets.length || typeof IntersectionObserver === "undefined") return setVisible(true);
+    const onScreen = new Set<Element>();
+    const obs = new IntersectionObserver((entries) => {
+      for (const e of entries) e.isIntersecting ? onScreen.add(e.target) : onScreen.delete(e.target);
+      setVisible(onScreen.size === 0);
+    });
+    targets.forEach((t) => obs.observe(t));
+    return () => obs.disconnect();
+  }, [pathname]);
+  return visible;
 }
 
 function Header() {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const { pathname, hash } = useLocation();
+  const ctaVisible = useHeaderCtaVisible(pathname);
 
   useEffect(() => setOpen(false), [pathname, hash]);
   useEffect(() => {
@@ -51,11 +59,15 @@ function Header() {
             </NavLink>
           ))}
         </nav>
-        <div className="hidden items-center gap-3 md:flex">
-          <Link to="/contact" className="btn-secondary !px-5 !py-2.5">
-            Contact
-          </Link>
-          <Link to="/demos/ai-voice-sales-agent" className="btn-primary !px-5 !py-2.5">
+        <div className="hidden w-[170px] justify-end md:flex">
+          <Link
+            to={DEMO_PATH}
+            className={`btn-primary !px-5 !py-2.5 transition-all duration-300 ${
+              ctaVisible ? "opacity-100" : "pointer-events-none translate-y-1 opacity-0"
+            }`}
+            aria-hidden={!ctaVisible}
+            tabIndex={ctaVisible ? undefined : -1}
+          >
             Try a Live Demo
           </Link>
         </div>
@@ -78,9 +90,11 @@ function Header() {
                 {item.label}
               </NavLink>
             ))}
-            <Link to="/demos/ai-voice-sales-agent" className="btn-primary mt-6">
-              Try a Live Demo <ArrowRight size={16} />
-            </Link>
+            {pathname !== DEMO_PATH && (
+              <Link to={DEMO_PATH} className="btn-primary mt-6">
+                Try a Live Demo <ArrowRight size={16} />
+              </Link>
+            )}
           </nav>
         </div>
       )}
@@ -100,6 +114,9 @@ function Footer() {
         </div>
         <nav aria-label="Footer" className="flex flex-col gap-3 text-[15px]">
           <p className="mb-1 text-[12px] font-medium uppercase tracking-[0.16em] text-subtle">Explore</p>
+          <Link to={DEMO_PATH} className="w-fit text-ink/80 hover:text-ink">
+            Live demo
+          </Link>
           {NAV.map((item) => (
             <Link key={item.to} to={item.to} className="w-fit text-ink/80 hover:text-ink">
               {item.label}
@@ -146,7 +163,6 @@ export default function Layout() {
       >
         Skip to content
       </a>
-      <AnnouncementBar />
       <Header />
       <main id="main" className="flex-1">
         <Outlet />

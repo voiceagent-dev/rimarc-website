@@ -34,7 +34,7 @@ function Hero() {
             efficient, connected workflows.
           </p>
           <div className="mt-10 flex flex-wrap gap-3">
-            <Link to="/demos/ai-voice-sales-agent" className="btn-primary">
+            <Link to="/demos/ai-voice-sales-agent" className="btn-primary" data-demo-cta="">
               Try a Live Demo <ArrowRight size={17} />
             </Link>
             <Link to="/demos/ai-voice-sales-agent#how-it-works" className="btn-secondary">
@@ -80,9 +80,6 @@ function VoiceSpotlight() {
                   </li>
                 ))}
               </ol>
-              <Link to="/demos/ai-voice-sales-agent" className="btn-primary mt-9">
-                Get a demo call <ArrowRight size={17} />
-              </Link>
             </div>
 
             <div className="relative">
@@ -167,11 +164,11 @@ function ClosingCta() {
               Ready to make your business smarter with AI?
             </h2>
             <div className="mt-10 flex flex-wrap justify-center gap-3">
-              <Link to="/contact" className="btn bg-white text-ink hover:-translate-y-0.5">
-                Contact Us <ArrowRight size={17} />
+              <Link to="/demos/ai-voice-sales-agent" className="btn bg-white text-ink hover:-translate-y-0.5" data-demo-cta="">
+                Try a Live Demo <ArrowRight size={17} />
               </Link>
-              <Link to="/demos/ai-voice-sales-agent" className="btn border border-white/30 text-white hover:border-white/60">
-                Try the live demo
+              <Link to="/contact" className="btn border border-white/30 text-white hover:border-white/60">
+                Contact Us
               </Link>
             </div>
           </div>

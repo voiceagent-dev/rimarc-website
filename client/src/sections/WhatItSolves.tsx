@@ -1,5 +1,4 @@
 import type { ReactNode } from "react";
-import { Link } from "react-router";
 import { ArrowRight, CheckCircle2, ClipboardList, FileText, MessageSquareText, Timer, UserRoundCheck } from "lucide-react";
 import { Arc, Eyebrow, Reveal } from "../components/Brand";
 
@@ -61,8 +60,8 @@ export default function WhatItSolves() {
       </div>
 
       <Reveal className="mt-8">
-        <div className="flex flex-col items-start justify-between gap-6 rounded-[var(--radius-card)] border border-line bg-white px-6 py-6 sm:px-8 lg:flex-row lg:items-center">
-          <ol className="flex flex-wrap items-center gap-x-3 gap-y-2 text-[15px] font-medium">
+        <div className="flex justify-center rounded-[var(--radius-card)] border border-line bg-white px-6 py-6 sm:px-8">
+          <ol className="flex flex-wrap items-center justify-center gap-x-3 gap-y-2 text-[15px] font-medium">
             {["Form", "AI call in < 1 min", "Requirements captured", "Advisor ready"].map((step, i, all) => (
               <li key={step} className="flex items-center gap-3">
                 <span>{step}</span>
@@ -70,9 +69,6 @@ export default function WhatItSolves() {
               </li>
             ))}
           </ol>
-          <Link to="/demos/ai-voice-sales-agent" className="btn-primary shrink-0">
-            Get a demo call <ArrowRight size={17} />
-          </Link>
         </div>
       </Reveal>
     </section>
